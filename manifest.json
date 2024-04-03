@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "PseudoBlocker",
+    "version": "0.1.0",
+    "version_name": "beta 0.1",
+    "description": "A pseudo ad blocker for Youtube",
+    "icons": {
+        "16": "icons/logo_16x16.png",
+        "48": "icons/logo_48x48.png",
+        "128": "icons/logo_128x128.png"
+    },
+    "permissions": ["storage", "tabs"], 
+    "host_permissions": ["https://*.youtube.com/*"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://*.youtube.com/*"],
+            "js": ["contentScript.js"]
+        }
+    ]
+}
