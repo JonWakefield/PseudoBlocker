@@ -1,2 +1,11 @@
 - may not need to use the "Tabs" for permissions in the manifest.json
 - could we just change the progress bar? container name "ytp-progress-bar-container"
+
+Things:
+
+1. Make sure window is fully loaded in
+2. Determine if an ad is playing or requested video
+3. if requested video -> do nothing
+4. if ad -> change speed
+5. check for 2nd ad, change speed if ad
+6. look for "skip ad" button, click it.

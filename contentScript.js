@@ -1,5 +1,5 @@
 
-
+const VIDEOSPEED = 4 // Ad speed
   
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, videoId, window } = obj;
@@ -36,24 +36,44 @@ function checkIfAd() {
             2. 1 ad is present
             2. 2 ads are present
     */
+   // span element, tells us if an ad is present or not:
    const adSpanElement = document.querySelector('.ytp-ad-duration-remaining');
 
-   // If the span element is found, get the div element inside it
+   // span found -> Ad on page
     if (adSpanElement) {
         const divElement = adSpanElement.querySelector('.ytp-ad-text');
+
+        changeVideoSpeed(VIDEOSPEED);
     
         // If the div element is found, extract its text content
         if (divElement) {
             const textContent = divElement.textContent.trim();
             console.log("Ad duration remaining: ", textContent); // Output: 0:14
         }
-    } else {
+    } 
+    // no ad is found
+    else {
         console.log("Could not find span element");
     }
     
 
 }
 
+function changeVideoSpeed(speed) {
+    /* Changes speed of the video element */
+    const video = document.querySelector('video'); // NOTE: Maybe look for more precise element?
+    // document.querySelector('video').playbackRate = 0.5;
+    console.log("player: ", video);
+    console.log("playback: ", video.playbackRate);
+    console.log("controls: ", video.controls);
+    if (video) {
+        video.playbackRate = speed;
+        console.log("Found video")
+        console.log("playback: ", video.playbackRate);
+    } else {
+        console.log("video not found");
+    }
+}
 
 // function initializeDoc(document) {
 //     console.log("Website is now loaded!")
