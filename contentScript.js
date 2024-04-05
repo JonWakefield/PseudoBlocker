@@ -1,5 +1,5 @@
 
-const VIDEOSPEED = 4 // Ad speed
+const ADVIDEOSPEED = 16 // Ad speed
   
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, videoId, window } = obj;
@@ -42,8 +42,28 @@ function checkIfAd() {
    // span found -> Ad on page
     if (adSpanElement) {
         const divElement = adSpanElement.querySelector('.ytp-ad-text');
+        const adSkipButton = document.querySelector('.ytp-ad-skip-button-modern.ytp-button');
 
-        changeVideoSpeed(VIDEOSPEED);
+        // get ad progress bar:
+        // const adProgressBar = document.querySelector('.ytp-ad-persistent-progress-bar');
+        // const progressBarStyle = adProgressBar.style.cssText;
+        // // Parse the inline style to extract the width value
+        // const widthMatch = /width:\s*(\d+(?:\.\d+)?%)/.exec(progressBarStyle);
+        // console.log("Width value: ", widthMatch[1]);
+
+        // change speed of ad:
+        changeVideoSpeed(ADVIDEOSPEED);
+
+        // check if we can click 'skip ad'
+        setTimeout(() => {
+            adSkipButton.click();
+        }, 1000);
+
+        
+        // change speed back to normal:
+        // NOTE: we not even need to reset the speed
+        // changeVideoSpeed(1); 
+
     
         // If the div element is found, extract its text content
         if (divElement) {
