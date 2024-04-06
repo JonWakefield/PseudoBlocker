@@ -6,11 +6,10 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
 
     if (type === "NEW") {
         currentVideo = videoId;
-        console.log("New video loaded!")
+        console.log("Video ID: ", currentVideo)
         
         // TODO: need to find better way to wait for video to load: (for now just add small delays)
         setTimeout(() => {
-            console.log('Delayed action');
             // check if an ad is present
             adPresent = checkIfAd();
             if (adPresent) {
@@ -82,13 +81,3 @@ function changeVideoSpeed(speed) {
         console.log("video not found");
     }
 }
-
-
-// old way of checking if ad is skippable:
-// // check if ad is skippable
-// if (!isNaN(timeLeft)) {
-//     console.log("skippable ad...")
-
-// } else {
-//     console.log("not a skippable ad...")
-// }

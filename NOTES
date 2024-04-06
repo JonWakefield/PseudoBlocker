@@ -12,7 +12,7 @@ Things:
 
 TODO:
 
-- Get rid of the timeouts
-- Skip ad when possible (remove timeout)
-- Need a definative way to know when the first ad is over
+- Replace the 2 second "window load in" timeout
+- figure out why stuff is printing to console multiple times
+- skip second ad
 - middle of the video ads
