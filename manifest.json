@@ -7,7 +7,6 @@
         "48": "icons/logo_48x48.png",
         "128": "icons/logo_128x128.png"
     },
-    "permissions": ["storage", "tabs"], 
     "host_permissions": ["https://*.youtube.com/*"],
     "background": {
         "service_worker": "background.js"

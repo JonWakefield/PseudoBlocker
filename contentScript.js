@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, tab } = obj;
 
     if (type === "NEW") {
-
+        
         // TODO: find better method to wait for video / ads to fully load 
         // in the meantime, 1.5 s seems to work well...
         setTimeout(() => {
@@ -39,10 +39,8 @@ function checkIfAd() {
     // span element only present if ad is present
     const adSpanElement = document.querySelector('.ytp-ad-duration-remaining');
     if (adSpanElement) {
-        console.log("Ad found!")
         return true;   
     } 
-    console.log("No ad found!")
     return false;
 }
 
@@ -59,7 +57,7 @@ function tryAdSkip(intervalId) {
         }
     } catch (error) {
         // haven't gotten error yet.. keep an eye out (could be fine if we get an error here...)
-        console.log("tryAdSkip error: ", error);
+        // console.log("tryAdSkip error: ", error);
     }
 }
 
