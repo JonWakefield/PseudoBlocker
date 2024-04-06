@@ -7,7 +7,8 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
 
     if (type === "NEW") {
 
-        // TODO: find better method to wait for video / ads to fully load
+        // TODO: find better method to wait for video / ads to fully load 
+        // in the meantime, 1.5 s seems to work well...
         setTimeout(() => {
             adRemovalProccess();
         }, 1500)
