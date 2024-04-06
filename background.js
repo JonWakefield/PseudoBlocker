@@ -9,16 +9,13 @@ chrome.runtime.onInstalled.addListener(({reason}) => {
     }
   });
 
-// add a tabs event listener to wait for user to navigate to youtube, send data to the content script
-chrome.tabs.onUpdated.addListener((tabId, tab) => {
-    if (tab.url && tab.url.includes("youtube.com/watch")) {
-      console.log("Watching a youtube vid!")
-      const queryParameters = tab.url.split("?")[1];
-      const urlParameters = new URLSearchParams(queryParameters);
-  
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (tab.url && tab.url.includes("youtube.com/watch") && changeInfo.status === 'complete') {
+      console.log("fully loaded!");
       chrome.tabs.sendMessage(tabId, {
         type: "NEW",
-        videoId: urlParameters.get("v"),
+        tab: tab,
       });
     }
 });

@@ -1,43 +1,59 @@
 
 const ADVIDEOSPEED = 16 // Ad speed
+const ADSKIPINTERVAL = 500 // units: ms
   
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
-    const { type, videoId, window } = obj;
+    const { type, tab } = obj;
 
     if (type === "NEW") {
-        currentVideo = videoId;
-        console.log("Video ID: ", currentVideo)
-        
-        // TODO: need to find better way to wait for video to load: (for now just add small delays)
+
+        // TODO: find better method to wait for video / ads to fully load
         setTimeout(() => {
-            // check if an ad is present
-            adPresent = checkIfAd();
-            if (adPresent) {
-                // const divElement = adSpanElement.querySelector('.ytp-ad-text');
-                const timeTellSkipDiv = document.querySelector('.ytp-ad-text.ytp-ad-preview-text-modern') // note: this won't be present on a video with no ad
-
-                // change speed of ad:
-                changeVideoSpeed(ADVIDEOSPEED);
-
-                // set up an interval to keep trying to skip the ad every 500 milliseconds
-                const interval = setInterval(() => {
-                    tryAdSkip(interval);
-                }, 500)
-
-
-            }
-        }, 2000); // 2000 milliseconds (2 seconds) delay
+            adRemovalProccess();
+        }, 1500)
     }
 });
 
+function adRemovalProccess() {
+    /* once a video has been found on the screen, this function is called and starts the ad "removal" process */
+    // check if an ad is present
+    adPresent = checkIfAd();
+    if (adPresent) {
+        // change speed of ad:
+        let speedChanged = changeVideoSpeed(ADVIDEOSPEED);
+        if (!speedChanged) {
+            return false;
+        }
+
+        // set up an interval to keep trying to skip the ad every `ADSKIPINTERVAL`
+        const interval = setInterval(() => {
+            tryAdSkip(interval);
+        }, ADSKIPINTERVAL)
+    }
+}
+
+function checkIfAd() {
+    /* Function checks if an ad is present on the DOM */
+
+    // span element only present if ad is present
+    const adSpanElement = document.querySelector('.ytp-ad-duration-remaining');
+    if (adSpanElement) {
+        console.log("Ad found!")
+        return true;   
+    } 
+    console.log("No ad found!")
+    return false;
+}
 
 function tryAdSkip(intervalId) {
+    /* Tries to skip the ad every ADSKIPINTERVAL milliseconds */
+
     try {
-        let adButton = document.querySelector('.ytp-ad-skip-button-modern.ytp-button');
+        let adButton = document.querySelector('.ytp-ad-skip-button-modern.ytp-button'); // get the ad skip button from the DOM
         if (adButton) {
             adButton.click();
         } else {
-            // no ad button present (can't skip ad)
+            // no ad button present (either ad has been skipped now or ad can't be skipped)
             clearInterval(intervalId);
         }
     } catch (error) {
@@ -46,38 +62,17 @@ function tryAdSkip(intervalId) {
     }
 }
 
-function checkIfAd() {
-    /* Function checks if an ad is currently displayed on the DOM
-        Possible Cases:
-            1. No ad is present
-            2. 1 ad is present
-            2. 2 ads are present
-    */
 
-   // span element, tells us if an ad is present or not:
-   const adSpanElement = document.querySelector('.ytp-ad-duration-remaining');
-    if (adSpanElement) {
-        return true;   
-        // If the div element is found, extract its text content
-    } 
-    else {
-        console.log("Could not find span element (no ad");
-        return false;
-    }
-}
 
 function changeVideoSpeed(speed) {
     /* Changes speed of the video element */
-    const video = document.querySelector('video'); // NOTE: Maybe look for more precise element?
-    // document.querySelector('video').playbackRate = 0.5;
-    console.log("player: ", video);
-    console.log("playback: ", video.playbackRate);
-    console.log("controls: ", video.controls);
+    const video = document.querySelector('video'); 
     if (video) {
         video.playbackRate = speed;
-        console.log("Found video")
-        console.log("playback: ", video.playbackRate);
+        console.log("Found video... changing speeds")
+        return true;
     } else {
         console.log("video not found");
+        return false;
     }
 }
