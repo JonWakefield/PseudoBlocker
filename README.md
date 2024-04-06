@@ -10,6 +10,10 @@ PseudoBlocker watches Youtube ads at 16x speeds, greatly reducing the amount of 
 - Auto skips ads when able
 - No permissions needed
 
+# Demo:
+
+[![Demo Video](https://img.youtube.com/vi/cKSr41rk3mo/0.jpg)](https://www.youtube.com/watch?v=cKSr41rk3mo)
+
 # Installation
 
 Setting up PseudoBlocker can be done via the chrome web store or cloned from github
