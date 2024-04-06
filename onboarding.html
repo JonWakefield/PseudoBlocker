@@ -7,19 +7,23 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="icons/logo.ico" />
-<title>Pseudo Blocker Welcome</title>
+<title>Welcome!</title>
 <style>
   body {
     width: 100%;
     height: 100vh;
     background-color: #FFDAB9;
+    background-image: radial-gradient(circle, #ffdab9 0%, #ffdab9 90%, #ffffff 100%);
     margin: 0;
+  }
+  .main {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
   }
-  
   h1 {
     font-family: "Montserrat", sans-serif;
     font-size: normal;
@@ -31,11 +35,10 @@
   
   p {
     font-size: 16px;
-    line-height: 1;
+    line-height: 0.5;
     font-weight: 600;
     margin-bottom: 10px;
     text-align: center;
-    padding-left: 20px;
   }
   
   ul {
@@ -48,17 +51,26 @@
     margin-bottom: 10px;
     list-style-type: circle;
   }
+  .footer {
+    position: absolute;
+    bottom: 0;
+    padding-bottom: 10px;
+  }
 </style>
 </head>
 <body>
-    <div>
+    <div class="main">
         <h1>Thanks for downloading!</h1>
         <p>Features</p>
         <ul>
           <li>Watches Youtube Ads at 16x speed</li>
           <li>Auto skips ads when able</li>
+          <li>No permissions needed</li>
           <li>That's it!</li>
         </ul>
+        <footer class="footer">
+          &copy; 2023 Jonathan Wakefield. All Rights Reserved.
+        </footer>
     </div>
 </body>
 </html>
