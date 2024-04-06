@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
         // in the meantime, 1.5 s seems to work well...
         setTimeout(() => {
             adRemovalProccess();
-        }, 1500)
+        }, 2000)
     }
 });
 

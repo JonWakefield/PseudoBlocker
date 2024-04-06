@@ -1,11 +1,12 @@
 {
     "name": "PseudoBlocker",
-    "version": "0.7.3",
-    "description": "A pseudo ad blocker for Youtube",
+    "version": "0.0.1",
+    "description": "PseudoBlocker is a pseudo ad blocker for Youtube. PseudoBlocker watches ads at 16x speed, so you don't have to!",
     "icons": {
-        "16": "icons/logo_16x16.png",
-        "48": "icons/logo_48x48.png",
-        "128": "icons/logo_128x128.png"
+        "16": "icons/logo_16x16.jpg",
+        "32": "icons/logo_32x32.jpg",
+        "48": "icons/logo_48x48.jpg",
+        "128": "icons/logo_128x128.jpg"
     },
     "host_permissions": ["https://*.youtube.com/*"],
     "background": {
