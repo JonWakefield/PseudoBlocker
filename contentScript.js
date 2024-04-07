@@ -1,17 +1,27 @@
 
 const ADVIDEOSPEED = 16 // Ad speed
 const ADSKIPINTERVAL = 500 // units: ms
+const intervalLoops = 10; // number of tries to locate
   
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, tab } = obj;
 
     if (type === "NEW") {
         
-        // TODO: find better method to wait for video / ads to fully load 
-        // in the meantime, 1.5 s seems to work well...
-        setTimeout(() => {
-            adRemovalProccess();
-        }, 2000)
+        let counter = 0;
+
+        // setup an interval to check if an ad is present n times
+        const interval = setInterval(() => {
+            if (counter < intervalLoops) {
+                let removedAd = adRemovalProccess();
+                if (removedAd) {
+                    clearInterval(interval);
+                }
+                counter++;
+            } else {
+                clearInterval(interval);
+            }
+        }, ADSKIPINTERVAL)
     }
 });
 
@@ -19,6 +29,7 @@ function adRemovalProccess() {
     /* once a video has been found on the screen, this function is called and starts the ad "removal" process */
     // check if an ad is present
     adPresent = checkIfAd();
+    let skippedAd = false;
     if (adPresent) {
         // change speed of ad:
         let speedChanged = changeVideoSpeed(ADVIDEOSPEED);
@@ -28,9 +39,15 @@ function adRemovalProccess() {
 
         // set up an interval to keep trying to skip the ad every `ADSKIPINTERVAL`
         const interval = setInterval(() => {
-            tryAdSkip(interval);
+            skippedAd = tryAdSkip();
+            if (skippedAd) {
+                clearInterval(interval);
+                return true;
+            }
         }, ADSKIPINTERVAL)
+        return true;
     }
+    return false;
 }
 
 function checkIfAd() {
@@ -44,7 +61,7 @@ function checkIfAd() {
     return false;
 }
 
-function tryAdSkip(intervalId) {
+function tryAdSkip() {
     /* Tries to skip the ad every ADSKIPINTERVAL milliseconds */
 
     try {
@@ -53,7 +70,7 @@ function tryAdSkip(intervalId) {
             adButton.click();
         } else {
             // no ad button present (either ad has been skipped now or ad can't be skipped)
-            clearInterval(intervalId);
+            return true;
         }
     } catch (error) {
         // haven't gotten error yet.. keep an eye out (could be fine if we get an error here...)
@@ -68,10 +85,8 @@ function changeVideoSpeed(speed) {
     const video = document.querySelector('video'); 
     if (video) {
         video.playbackRate = speed;
-        console.log("Found video... changing speeds")
         return true;
     } else {
-        console.log("video not found");
         return false;
     }
 }
