@@ -1,6 +1,6 @@
 # PseudoBlocker
 
-## Description:
+# Description:
 
 PseudoBlocker watches Youtube ads at 16x speeds, greatly reducing the amount of time spent watching ads.
 
@@ -18,7 +18,11 @@ PseudoBlocker watches Youtube ads at 16x speeds, greatly reducing the amount of 
 
 Setting up PseudoBlocker can be done via the chrome web store or cloned from github
 
-## Cloned from git
+### Chrome Web Store:
+
+PseudoBlocker can be downloaded from the chrome web store [Here](https://chromewebstore.google.com/detail/pseudoblocker/dhknglbhklndbfiibpocgckdhfdagcgb)
+
+### Cloned from git
 
 1. Clone this repository
 2. Navigate to `chrome://extensions/`

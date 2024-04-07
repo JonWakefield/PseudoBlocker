@@ -6,15 +6,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-<link rel="icon" type="image/x-icon" href="icons/logo.ico" />
+<link rel="icon" type="image/x-icon" href="icons/logo_16x16.jpg" />
 <title>Welcome!</title>
 <style>
   body {
     width: 100%;
     height: 100vh;
     background-color: #FFDAB9;
-    background-image: radial-gradient(circle, #ffdab9 0%, #ffdab9 90%, #ffffff 100%);
+    /* background-image: radial-gradient(circle, #ffdab9 0%, #ffdab9 90%, #ffffff 100%); */
     margin: 0;
+    font-family: "Montserrat", sans-serif;
   }
   .main {
     width: 100%;
@@ -23,6 +24,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    text-align: center;
   }
   h1 {
     font-family: "Montserrat", sans-serif;
@@ -40,37 +42,75 @@
     margin-bottom: 10px;
     text-align: center;
   }
-  
+  .features {
+    text-align: start;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    list-style-type: circle;
+  }
+  .ref-list {
+    text-align: start;
+    list-style-type: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding-right: 50px;
+  }
   ul {
     margin-bottom: 20px;
   }
   
   li {
-    text-align: start;
     font-size: 16px;
     margin-bottom: 10px;
-    list-style-type: circle;
   }
+  a {
+    color: #333333;
+    /* text-decoration: none; */
+  }
+  a:hover {
+    color: #004080;
+  }
+
   .footer {
     position: absolute;
     bottom: 0;
     padding-bottom: 10px;
+    font-size: 12px;
   }
+
+
 </style>
 </head>
 <body>
     <div class="main">
+      <div>
         <h1>Thanks for downloading!</h1>
         <p>Features</p>
-        <ul>
+        <ul class="features">
           <li>Watches Youtube Ads at 16x speed</li>
           <li>Auto skips ads when able</li>
           <li>No permissions needed</li>
           <li>That's it!</li>
         </ul>
-        <footer class="footer">
-          &copy; 2023 Jonathan Wakefield. All Rights Reserved.
-        </footer>
+      </div>
+      <br>
+      <div>
+        <ul class="ref-list">
+          <li>
+            &#x1F4BB View Source <a href="https://github.com/JonWakefield/PseudoBlocker" target="_blank">Code</a>
+          </li>
+          <li>
+            &#x1F4DD Leave a <a href="https://chromewebstore.google.com/detail/pseudoblocker/dhknglbhklndbfiibpocgckdhfdagcgb" target="_blank">Review</a>
+          </li>
+          <li>
+            &#x2615 Buy me a <a href="https://www.buymeacoffee.com/jonwakefield" target="_blank">Coffee</a>
+          </li>
+        </ul>
+      </div>
+      <footer class="footer">
+        &copy; 2023 Jonathan Wakefield. All Rights Reserved.
+      </footer>
     </div>
 </body>
 </html>
