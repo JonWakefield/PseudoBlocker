@@ -12,7 +12,7 @@ PseudoBlocker watches Youtube ads at 16x speeds, greatly reducing the amount of 
 
 # Demo:
 
-[![Demo Video](https://img.youtube.com/vi/cKSr41rk3mo/0.jpg)](https://www.youtube.com/watch?v=cKSr41rk3mo)
+[![Demo Video](https://img.youtube.com/vi/ZQa3c0AWe98/0.jpg)](https://youtu.be/ZQa3c0AWe98)
 
 # Installation
 
