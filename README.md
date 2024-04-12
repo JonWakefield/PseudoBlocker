@@ -25,7 +25,7 @@ PseudoBlocker can be downloaded from the chrome web store [Here](https://chromew
 ### Cloned from git
 
 1. Clone this repository
-2. Navigate to `chrome://extensions/`
+2. In Chrome, Navigate to `chrome://extensions`
 3. Turn on `Developer Mode`
 4. Click `load unpacked`
 5. selected the cloned repository
@@ -33,7 +33,7 @@ PseudoBlocker can be downloaded from the chrome web store [Here](https://chromew
 
 # License
 
-This project is open source, feel free to use this code in your own project.
+This project is open source, feel free to use this code in your own project!
 
 # Contact
 
