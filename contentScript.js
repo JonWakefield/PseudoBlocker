@@ -1,7 +1,5 @@
 const ADVIDEOSPEED = 16 // Ad speed
 const ADSKIPINTERVAL = 500 // units: ms
-const intervalLoops = 10; // number of tries to locate
-
 
 
 // Define the function to be called when DOM changes occur
