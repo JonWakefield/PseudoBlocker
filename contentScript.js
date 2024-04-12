@@ -1,29 +1,38 @@
-
 const ADVIDEOSPEED = 16 // Ad speed
 const ADSKIPINTERVAL = 500 // units: ms
 const intervalLoops = 10; // number of tries to locate
+
+
+
+// Define the function to be called when DOM changes occur
+function domChangeListener(mutationsList, observer) {
+    // Loop through the mutations and do something (e.g., log a message)
+    mutationsList.forEach(mutation => {
+      // Call your function here
+      adRemovalProccess();
+    });
+  }
   
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, tab } = obj;
 
     if (type === "NEW") {
+        // Select the <video> element on the page
+        const videoElement = document.querySelector('video');
         
-        let counter = 0;
-
-        // setup an interval to check if an ad is present n times
-        const interval = setInterval(() => {
-            if (counter < intervalLoops) {
-                let removedAd = adRemovalProccess();
-                if (removedAd) {
-                    clearInterval(interval);
-                }
-                counter++;
-            } else {
-                clearInterval(interval);
-            }
-        }, ADSKIPINTERVAL)
+        // Check if the <video> element exists
+        if (videoElement) {
+            // Create a MutationObserver instance to observe changes within the <video> element
+            const observer = new MutationObserver(domChangeListener);
+            
+            // Start observing the <video> element for DOM changes
+            observer.observe(videoElement, { attributes: true, childList: true, subtree: true });
+        } else {
+        console.log("No <video> element found on the page.");
+        }
     }
 });
+  
 
 function adRemovalProccess() {
     /* once a video has been found on the screen, this function is called and starts the ad "removal" process */
@@ -77,7 +86,6 @@ function tryAdSkip() {
         // console.log("tryAdSkip error: ", error);
     }
 }
-
 
 
 function changeVideoSpeed(speed) {
