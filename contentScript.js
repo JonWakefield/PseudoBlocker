@@ -2,11 +2,9 @@ const ADVIDEOSPEED = 16 // Ad speed
 const ADSKIPINTERVAL = 500 // units: ms
 
 
-// Define the function to be called when DOM changes occur
+
 function domChangeListener(mutationsList, observer) {
-    // Loop through the mutations and do something (e.g., log a message)
     mutationsList.forEach(mutation => {
-      // Call your function here
       adRemovalProccess();
     });
   }
