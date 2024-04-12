@@ -15,13 +15,8 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
     if (type === "NEW") {
         // Select the <video> element on the page
         const videoElement = document.querySelector('video');
-        
-        // Check if the <video> element exists
         if (videoElement) {
-            // Create a MutationObserver instance to observe changes within the <video> element
             const observer = new MutationObserver(domChangeListener);
-            
-            // Start observing the <video> element for DOM changes
             observer.observe(videoElement, { attributes: true, childList: true, subtree: true });
         } else {
         console.log("No <video> element found on the page.");
