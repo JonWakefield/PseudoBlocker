@@ -85,7 +85,6 @@ function changeVideoSpeed(speed) {
     if (video) {
         video.playbackRate = speed;
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
