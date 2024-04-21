@@ -35,6 +35,6 @@ PseudoBlocker can be downloaded from the chrome web store [Here](https://chromew
 
 This project is open source, feel free to use this code in your own project!
 
-## Support and Feedback
+# Contact
 
-If you encounter any issues or have suggestions for improving StockBot, please feel free to open an issue on GitHub. Your feedback is valuable and helps to enhance the bot for all users.
+Any questions, bug reports, or general inquires can be sent to me via email: jonwakefield.mi@gmail.com
