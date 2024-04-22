@@ -37,4 +37,4 @@ This project is open source, feel free to use this code in your own project!
 
 # Support and Feedback
 
-If you encounter any issues or have suggestions for improving PseudoBlocker, please feel free to open an issue on GitHub. Your feedback is valuable and helps to enhance the bot for all users.
+If you encounter any issues or have suggestions for improving PseudoBlocker, please feel free to open an issue on GitHub. Your feedback is valuable and helps to enhance the project for all users.
