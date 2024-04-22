@@ -1,6 +1,6 @@
 const ADVIDEOSPEED = 16 // Ad speed
 const ADSKIPINTERVAL = 500 // units: ms
-
+const adSkipButtonClassName = ".ytp-skip-ad-button"
 
 
 function domChangeListener(mutationsList, observer) {
@@ -65,9 +65,9 @@ function tryAdSkip() {
     /* Tries to skip the ad every ADSKIPINTERVAL milliseconds */
 
     try {
-        let adButton = document.querySelector('.ytp-ad-skip-button-modern.ytp-button'); // get the ad skip button from the DOM
-        if (adButton) {
-            adButton.click();
+        let adSkipButton = document.querySelector(adSkipButtonClassName);
+        if (adSkipButton) {
+            adSkipButton.click();
         } else {
             // no ad button present (either ad has been skipped now or ad can't be skipped)
             return true;
