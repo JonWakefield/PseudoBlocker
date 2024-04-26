@@ -1,6 +1,7 @@
 const ADVIDEOSPEED = 16 // Ad speed
 const ADSKIPINTERVAL = 500 // units: ms
-const adSkipButtonClassName = ".ytp-skip-ad-button"
+const adSkipButtonClassName = ".ytp-skip-ad-button";
+const adSkipButtonOldYoutubeUi = ".ytp-ad-skip-button-icon-modern";
 
 
 function domChangeListener(mutationsList, observer) {
@@ -66,8 +67,12 @@ function tryAdSkip() {
 
     try {
         let adSkipButton = document.querySelector(adSkipButtonClassName);
+        let adSkipButtonOldUi = document.querySelector(adSkipButtonOldYoutubeUi);
         if (adSkipButton) {
             adSkipButton.click();
+        }
+        else if (adSkipButtonOldUi) {
+            adSkipButtonOldUi.click();
         } else {
             // no ad button present (either ad has been skipped now or ad can't be skipped)
             return true;
