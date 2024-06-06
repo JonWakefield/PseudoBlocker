@@ -1,5 +1,14 @@
 # PseudoBlocker
 
+# Update:
+
+Occassionally Youtube (Google) may flag users with an "Ad blockers are not allowed" pop-up for using Pseudoblocker.
+It seems Youtube sends this warning out with little or no [evidence](https://www.reddit.com/r/youtube/comments/179t1p0/false_ad_blocker_report/), as a threat to deter ad blockers.
+In the meantime, clicking "report issue and stating that you are not using an ad-blocker seems to work as a bandaid solution.
+Thanks.
+
+![adblock warning](ad_block_warning.png)
+
 # Description:
 
 PseudoBlocker watches Youtube ads at 16x speeds, greatly reducing the amount of time spent watching ads.
