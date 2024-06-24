@@ -8,13 +8,21 @@
     "48": "icons/logo_48x48.jpg",
     "128": "icons/logo_128x128.jpg"
   },
-  "host_permissions": ["https://*.youtube.com/*", "https://*.max.com/*"],
+  "host_permissions": [
+    "https://*.youtube.com/*",
+    "https://*.max.com/*",
+    "https://*.netflix.com/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://*.youtube.com/*", "https://*.max.com/*"],
+      "matches": [
+        "https://*.youtube.com/*",
+        "https://*.max.com/*",
+        "https://*.netflix.com/*"
+      ],
       "runAt": "document_idle",
       "js": ["contentScript.js"]
     }

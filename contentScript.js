@@ -14,6 +14,13 @@ let hboAdPlaying = false;
 let hboFastForward = false;
 const HBOADSPEED = 5 // Ad speed
 
+// Netflix
+const nflxAppRoot = '#appMountPoint';
+// const nflxAdBanner = ".forward-anim default-ltr-cache-bwhi8r";
+const nflxAdBanner = ".forward-anim";
+let nflxAdPlaying = false;
+const nflxAdSpeed = 16;
+
 function domChangeListener(mutationsList, observer) {
     mutationsList.forEach(mutation => {
         // console.log("mutation observered, Checking for ad...")
@@ -24,6 +31,40 @@ function domChangeListener(mutationsList, observer) {
 
 function findVideoElement() {
     return document.querySelector('video');
+}
+
+function nflxDomListener(mutationsList, observer) {
+    // console.log("Checking for ad...")
+    const adBanner = checkIfAd(nflxAdBanner);
+    if (adBanner) {
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            // console.log("Changing speed...")
+            let speedChanged = changeVideoSpeed(nflxAdSpeed);
+            if (!speedChanged) {
+                return false;
+            }
+            nflxAdPlaying = true;
+            return;
+        }
+        
+    } else if (!adBanner && nflxAdPlaying){
+        // set speed back to 1x...
+        // console.log("Ad ended!")
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            // console.log("Found video element")
+            let speedChanged = changeVideoSpeed(defaultVideoSpeed);
+            if (!speedChanged) {
+                // console.log("Failed to change video speed!")
+                return false;
+            }
+            nflxAdPlaying = false;
+            return;
+        }
+    } else {
+        // console.log("could not find an ad...")
+    }
 }
 
 function hboDomListener(mutationsList, observer) {
@@ -78,6 +119,17 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
             const hboObserver = new MutationObserver(hboDomListener);
             hboObserver.observe(appRoot, {childList: true, subtree: true});
         } 
+    } else if (type === "NFLX") {
+        // console.log("In content")
+        const appRoot = document.querySelector(nflxAppRoot);
+        if (appRoot) {
+            console.log("Found app root")
+            const nflxObserver = new MutationObserver(nflxDomListener);
+            nflxObserver.observe(appRoot, {childList: true, subtree: true});
+        } else {
+            console.log("Could not find root...")
+        }
+
     }
 });
 
