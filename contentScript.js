@@ -1,20 +1,23 @@
-const ADVIDEOSPEED = 16 // Ad speed
-const HBOADSPEED = 5 // Ad speed
 const defaultVideoSpeed = 1
-const ADSKIPINTERVAL = 500 // units: ms
-const adSkipButtonClassName = ".ytp-skip-ad-button";0
+
+// Youtube
+const ytAdSkipButtonClassName = ".ytp-skip-ad-button";0
 const adSkipButtonOldYoutubeUi = ".ytp-ad-skip-button-icon-modern";
-const youtubeAdBanner = '.ytp-ad-duration-remaining';
+const ytAdBanner = '.ytp-ad-duration-remaining';
+const ADVIDEOSPEED = 16 // Ad speed
+const ADSKIPINTERVAL = 500 // units: ms
 
-
+// HBO
 const hboAdBanner = ".AdBadgeContainer-Beam-Web-Ent__sc-1jahjvv-1";
 const hboAppRoot = '#app-root';
 let hboAdPlaying = false;
 let hboFastForward = false;
+const HBOADSPEED = 5 // Ad speed
 
 function domChangeListener(mutationsList, observer) {
     mutationsList.forEach(mutation => {
         console.log("mutation observered, Checking for ad...")
+        adRemovalProccess();
     });
   }
 
@@ -58,9 +61,8 @@ function hboDomListener(mutationsList, observer) {
 
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, tab } = obj;
-
-    if (type === "NEW") {
-        // Select the <video> element on the pageIdally 
+    if (type === "YT") {
+        console.log("On Youtube...")
         const videoElement = document.querySelector('video');
         if (videoElement) {
             const observer = new MutationObserver(domChangeListener);
@@ -83,15 +85,15 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
 function adRemovalProccess() {
     /* once a video has been found on the screen, this function is called and starts the ad "removal" process */
     // check if an ad is present
-    adPresent = checkIfAd();
+    adPresent = checkIfAd(ytAdBanner);
     let skippedAd = false;
     if (adPresent) {
+        console.log("FOUND AD!!")
         // change speed of ad:
         let speedChanged = changeVideoSpeed(ADVIDEOSPEED);
         if (!speedChanged) {
             return false;
         }
-
         // set up an interval to keep trying to skip the ad every `ADSKIPINTERVAL`
         const interval = setInterval(() => {
             skippedAd = tryAdSkip();
@@ -101,15 +103,16 @@ function adRemovalProccess() {
             }
         }, ADSKIPINTERVAL)
         return true;
+    } else {
+        console.log("NO AD FOUND!!")
     }
     return false;
 }
 
 function checkIfAd(adBanner) {
     /* Function checks if an ad is present on the DOM */
-    // span element only present if ad is present
-    const adSpanElement = document.querySelector(adBanner);
-    if (adSpanElement) {
+    const adElement = document.querySelector(adBanner);
+    if (adElement) {
         return true;   
     } 
     return false;
@@ -119,7 +122,7 @@ function tryAdSkip() {
     /* Tries to skip the ad every ADSKIPINTERVAL milliseconds */
 
     try {
-        let adSkipButton = document.querySelector(adSkipButtonClassName);
+        let adSkipButton = document.querySelector(ytAdSkipButtonClassName);
         let adSkipButtonOldUi = document.querySelector(adSkipButtonOldYoutubeUi);
         if (adSkipButton) {
             adSkipButton.click();

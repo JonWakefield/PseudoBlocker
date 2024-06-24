@@ -12,7 +12,17 @@ chrome.runtime.onInstalled.addListener(({reason}) => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete') {
-    if (tab.url && tab.url.includes("play.max.com/video")) {
+    if (tab.url && tab.url.includes("youtube.com/watch")) {
+      try {
+        const response = chrome.tabs.sendMessage(tabId, {
+          type: "YT",
+          tab: tab,
+        });
+      } catch (error) {
+        console.log("Caught error on Youtube: ", error);
+      }
+    }
+    else if (tab.url && tab.url.includes("play.max.com/video")) {
         console.log("On HBO")
         try {
           const response = chrome.tabs.sendMessage(tabId, {
@@ -20,9 +30,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
               tab: tab,
             });
         } catch (error) {
-          console.log("Caught error: ", error);
+          console.log("Caught error on HBO: ", error);
         }
       }
     }
 });
-
