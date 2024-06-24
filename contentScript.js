@@ -1,24 +1,26 @@
 const defaultVideoSpeed = 1
 
 // Youtube
-const ytAdSkipButtonClassName = ".ytp-skip-ad-button";0
+// const ytAppRoot = 'ytd-app';
+const ytAppRoot = 'style-scope ytd-app';
+const ytAdSkipButtonClassName = ".ytp-skip-ad-button";
 const adSkipButtonOldYoutubeUi = ".ytp-ad-skip-button-icon-modern";
 const ytAdBanner = '.ytp-ad-duration-remaining';
 const ADVIDEOSPEED = 16 // Ad speed
 const ADSKIPINTERVAL = 500 // units: ms
 
 // HBO
-const hboAdBanner = ".AdBadgeContainer-Beam-Web-Ent__sc-1jahjvv-1";
 const hboAppRoot = '#app-root';
+const hboAdBanner = ".AdBadgeContainer-Beam-Web-Ent__sc-1jahjvv-1";
 let hboAdPlaying = false;
 let hboFastForward = false;
 const HBOADSPEED = 5 // Ad speed
 
-function domChangeListener(mutationsList, observer) {
-    mutationsList.forEach(mutation => {
-        // console.log("mutation observered, Checking for ad...")
-        adRemovalProccess();
-    });
+
+
+function ytDomListener(mutationsList, observer) {
+    console.log("Trying ad removal process...")
+    adRemovalProccess();
   }
 
 
@@ -62,10 +64,9 @@ function hboDomListener(mutationsList, observer) {
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, tab } = obj;
     if (type === "YT") {
-        console.log("On Youtube...")
         const videoElement = document.querySelector('video');
         if (videoElement) {
-            const observer = new MutationObserver(domChangeListener);
+            const observer = new MutationObserver(ytDomListener);
             observer.observe(videoElement, { attributes: true, childList: true, subtree: true });
         } else {
         console.log("No <video> element found on the page.");
@@ -88,7 +89,7 @@ function adRemovalProccess() {
     adPresent = checkIfAd(ytAdBanner);
     let skippedAd = false;
     if (adPresent) {
-        // console.log("FOUND AD!!")
+        console.log("FOUND AD!!")
         // change speed of ad:
         let speedChanged = changeVideoSpeed(ADVIDEOSPEED);
         if (!speedChanged) {
@@ -104,7 +105,7 @@ function adRemovalProccess() {
         }, ADSKIPINTERVAL)
         return true;
     } else {
-        // console.log("NO AD FOUND!!")
+        console.log("NO AD FOUND!!")
     }
     return false;
 }
