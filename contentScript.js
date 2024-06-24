@@ -1,20 +1,66 @@
 const ADVIDEOSPEED = 16 // Ad speed
+const HBOADSPEED = 5 // Ad speed
+const defaultVideoSpeed = 1
 const ADSKIPINTERVAL = 500 // units: ms
-const adSkipButtonClassName = ".ytp-skip-ad-button";
+const adSkipButtonClassName = ".ytp-skip-ad-button";0
 const adSkipButtonOldYoutubeUi = ".ytp-ad-skip-button-icon-modern";
+const youtubeAdBanner = '.ytp-ad-duration-remaining';
 
+
+const hboAdBanner = ".AdBadgeContainer-Beam-Web-Ent__sc-1jahjvv-1";
+const hboAppRoot = '#app-root';
+let hboAdPlaying = false;
+let hboFastForward = false;
 
 function domChangeListener(mutationsList, observer) {
     mutationsList.forEach(mutation => {
-      adRemovalProccess();
+        console.log("mutation observered, Checking for ad...")
     });
   }
-  
+
+
+function findVideoElement() {
+    return document.querySelector('video');
+}
+
+function hboDomListener(mutationsList, observer) {
+    const adBanner = checkIfAd(hboAdBanner);
+    if (adBanner) {
+        // console.log("FOUND AD!!")
+        // fast forward ad 
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            // console.log("Found video element")
+            let speedChanged = changeVideoSpeed(HBOADSPEED);
+            if (!speedChanged) {
+                // console.log("Failed to change video speed!")
+                return false;
+            }
+            hboAdPlaying = true;
+            return;
+        }
+    } else if (!adBanner && hboAdPlaying) {
+        // console.log("NO AD PLAYING...")
+        // return video speed back to 1x
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            // console.log("Found video element")
+            let speedChanged = changeVideoSpeed(defaultVideoSpeed);
+            if (!speedChanged) {
+                // console.log("Failed to change video speed!")
+                return false;
+            }
+            hboAdPlaying = false;
+            return;
+        }
+    }
+}
+
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, tab } = obj;
 
     if (type === "NEW") {
-        // Select the <video> element on the page
+        // Select the <video> element on the pageIdally 
         const videoElement = document.querySelector('video');
         if (videoElement) {
             const observer = new MutationObserver(domChangeListener);
@@ -22,9 +68,17 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
         } else {
         console.log("No <video> element found on the page.");
         }
+    } else if (type === "HBO") {
+        const appRoot = document.querySelector(hboAppRoot)
+        if (appRoot) {
+            // console.log("creating a new hbo observer...")
+            // set up MutationObserver to detect changes on the DOM, ultimitaly waiting for the video element to load
+            const hboObserver = new MutationObserver(hboDomListener);
+            hboObserver.observe(appRoot, {childList: true, subtree: true});
+        } 
     }
 });
-  
+
 
 function adRemovalProccess() {
     /* once a video has been found on the screen, this function is called and starts the ad "removal" process */
@@ -51,11 +105,10 @@ function adRemovalProccess() {
     return false;
 }
 
-function checkIfAd() {
+function checkIfAd(adBanner) {
     /* Function checks if an ad is present on the DOM */
-
     // span element only present if ad is present
-    const adSpanElement = document.querySelector('.ytp-ad-duration-remaining');
+    const adSpanElement = document.querySelector(adBanner);
     if (adSpanElement) {
         return true;   
     } 
