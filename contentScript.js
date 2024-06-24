@@ -16,7 +16,7 @@ const HBOADSPEED = 5 // Ad speed
 
 function domChangeListener(mutationsList, observer) {
     mutationsList.forEach(mutation => {
-        console.log("mutation observered, Checking for ad...")
+        // console.log("mutation observered, Checking for ad...")
         adRemovalProccess();
     });
   }
@@ -88,7 +88,7 @@ function adRemovalProccess() {
     adPresent = checkIfAd(ytAdBanner);
     let skippedAd = false;
     if (adPresent) {
-        console.log("FOUND AD!!")
+        // console.log("FOUND AD!!")
         // change speed of ad:
         let speedChanged = changeVideoSpeed(ADVIDEOSPEED);
         if (!speedChanged) {
@@ -104,7 +104,7 @@ function adRemovalProccess() {
         }, ADSKIPINTERVAL)
         return true;
     } else {
-        console.log("NO AD FOUND!!")
+        // console.log("NO AD FOUND!!")
     }
     return false;
 }

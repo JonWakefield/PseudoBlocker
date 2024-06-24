@@ -23,7 +23,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       }
     }
     else if (tab.url && tab.url.includes("play.max.com/video")) {
-        console.log("On HBO")
         try {
           const response = chrome.tabs.sendMessage(tabId, {
               type: "HBO",
