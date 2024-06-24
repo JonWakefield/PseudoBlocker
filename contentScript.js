@@ -17,10 +17,6 @@ let hboFastForward = false;
 const HBOADSPEED = 5 // Ad speed
 
 
-
-
-
-
 function findVideoElement() {
     return document.querySelector('video');
 }
