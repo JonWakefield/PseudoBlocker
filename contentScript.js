@@ -18,10 +18,7 @@ const HBOADSPEED = 5 // Ad speed
 
 
 
-function ytDomListener(mutationsList, observer) {
-    console.log("Trying ad removal process...")
-    adRemovalProccess();
-  }
+
 
 
 function findVideoElement() {
@@ -61,30 +58,8 @@ function hboDomListener(mutationsList, observer) {
     }
 }
 
-chrome.runtime.onMessage.addListener((obj, sender, response) => {
-    const { type, tab } = obj;
-    if (type === "YT") {
-        const videoElement = document.querySelector('video');
-        if (videoElement) {
-            const observer = new MutationObserver(ytDomListener);
-            observer.observe(videoElement, { attributes: true, childList: true, subtree: true });
-        } else {
-        console.log("No <video> element found on the page.");
-        }
-    } else if (type === "HBO") {
-        const appRoot = document.querySelector(hboAppRoot)
-        if (appRoot) {
-            // console.log("creating a new hbo observer...")
-            // set up MutationObserver to detect changes on the DOM, ultimitaly waiting for the video element to load
-            const hboObserver = new MutationObserver(hboDomListener);
-            hboObserver.observe(appRoot, {childList: true, subtree: true});
-        } 
-    }
-});
-
-
-function adRemovalProccess() {
-    /* once a video has been found on the screen, this function is called and starts the ad "removal" process */
+function ytDomListener(mutationsList, observer) {
+    console.log("Checking for Youtube Ad...")
     // check if an ad is present
     adPresent = checkIfAd(ytAdBanner);
     let skippedAd = false;
@@ -109,6 +84,28 @@ function adRemovalProccess() {
     }
     return false;
 }
+
+chrome.runtime.onMessage.addListener((obj, sender, response) => {
+    const { type, tab } = obj;
+    if (type === "YT") {
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            const observer = new MutationObserver(ytDomListener);
+            observer.observe(videoElement, { attributes: true, childList: true, subtree: true });
+        } else {
+        console.log("No <video> element found on the page.");
+        }
+    } else if (type === "HBO") {
+        const appRoot = document.querySelector(hboAppRoot)
+        if (appRoot) {
+            // console.log("creating a new hbo observer...")
+            // set up MutationObserver to detect changes on the DOM, ultimitaly waiting for the video element to load
+            const hboObserver = new MutationObserver(hboDomListener);
+            hboObserver.observe(appRoot, {childList: true, subtree: true});
+        } 
+    }
+});
+
 
 function checkIfAd(adBanner) {
     /* Function checks if an ad is present on the DOM */
