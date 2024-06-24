@@ -21,31 +21,25 @@ function findVideoElement() {
     return document.querySelector('video');
 }
 
-function hboDomListener(mutationsList, observer) {
+function hboDomListener() {
     const adBanner = checkIfAd(hboAdBanner);
     if (adBanner) {
-        // console.log("FOUND AD!!")
         // fast forward ad 
         const videoElement = findVideoElement();
         if (videoElement) {
-            // console.log("Found video element")
             let speedChanged = changeVideoSpeed(HBOADSPEED);
             if (!speedChanged) {
-                // console.log("Failed to change video speed!")
                 return false;
             }
             hboAdPlaying = true;
             return;
         }
     } else if (!adBanner && hboAdPlaying) {
-        // console.log("NO AD PLAYING...")
         // return video speed back to 1x
         const videoElement = findVideoElement();
         if (videoElement) {
-            // console.log("Found video element")
             let speedChanged = changeVideoSpeed(defaultVideoSpeed);
             if (!speedChanged) {
-                // console.log("Failed to change video speed!")
                 return false;
             }
             hboAdPlaying = false;
@@ -54,8 +48,7 @@ function hboDomListener(mutationsList, observer) {
     }
 }
 
-function ytDomListener(mutationsList, observer) {
-    console.log("Checking for Youtube Ad...")
+function ytDomListener() {
     // check if an ad is present
     adPresent = checkIfAd(ytAdBanner);
     let skippedAd = false;
@@ -75,8 +68,6 @@ function ytDomListener(mutationsList, observer) {
             }
         }, ADSKIPINTERVAL)
         return true;
-    } else {
-        console.log("NO AD FOUND!!")
     }
     return false;
 }
@@ -94,8 +85,6 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
     } else if (type === "HBO") {
         const appRoot = document.querySelector(hboAppRoot)
         if (appRoot) {
-            // console.log("creating a new hbo observer...")
-            // set up MutationObserver to detect changes on the DOM, ultimitaly waiting for the video element to load
             const hboObserver = new MutationObserver(hboDomListener);
             hboObserver.observe(appRoot, {childList: true, subtree: true});
         } 
