@@ -1,17 +1,15 @@
-const ADVIDEOSPEED = 16 // Ad speed
+const ADVIDEOSPEED = 6 // Ad speed
 const defaultVideoSpeed = 1
 const ADSKIPINTERVAL = 500 // units: ms
 const adSkipButtonClassName = ".ytp-skip-ad-button";0
 const adSkipButtonOldYoutubeUi = ".ytp-ad-skip-button-icon-modern";
 const youtubeAdBanner = '.ytp-ad-duration-remaining';
+
+
 const hboAdBanner = ".AdBadgeContainer-Beam-Web-Ent__sc-1jahjvv-1";
-
-/* 
-    HBO TO-DO:
-    1) return UI / Video display back to "no-ad" version
-    2) set video playback speed back to users speed (1x Max doesn't have UI option to change speed)
-
-*/
+const hboAppRoot = '#app-root';
+let hboAdPlaying = false;
+let hboFastForward = false;
 
 function domChangeListener(mutationsList, observer) {
     mutationsList.forEach(mutation => {
@@ -19,15 +17,51 @@ function domChangeListener(mutationsList, observer) {
     });
   }
 
+
 function findVideoElement() {
     return document.querySelector('video');
 }
-  
+
+function hboDomListener(mutationsList, observer) {
+    const adBanner = checkIfAd(hboAdBanner);
+    if (adBanner) {
+        console.log("FOUND AD!!")
+        // fast forward ad 
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            console.log("Found video element")
+            let speedChanged = changeVideoSpeed(ADVIDEOSPEED);
+            if (!speedChanged) {
+                console.log("Failed to change video speed!")
+                return false;
+            }
+            hboAdPlaying = true;
+            return;
+        } else {
+            console.log("Could not find video element")
+        }
+    } else if (!adBanner && hboAdPlaying) {
+        console.log("NO AD PLAYING...")
+        // return video speed back to 1x
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            console.log("Found video element")
+            let speedChanged = changeVideoSpeed(defaultVideoSpeed);
+            if (!speedChanged) {
+                console.log("Failed to change video speed!")
+                return false;
+            }
+            hboAdPlaying = false;
+            return;
+        }
+    }
+}
+
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, tab } = obj;
 
     if (type === "NEW") {
-        // Select the <video> element on the page
+        // Select the <video> element on the pageIdally 
         const videoElement = document.querySelector('video');
         if (videoElement) {
             const observer = new MutationObserver(domChangeListener);
@@ -36,55 +70,14 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
         console.log("No <video> element found on the page.");
         }
     } else if (type === "HBO") {
-        // set up MutationObserver to detect changes on the DOM, ultimitaly waiting for the video element to load
-        const observer = new MutationObserver((mutationsList, observer) => {
-            for (const mutation of mutationsList) {
-                if (mutation.type === 'childList') {
-                    const adBanner = checkIfAd(hboAdBanner)
-                    if (adBanner) {
-                        console.log("FOUND AD!!!")
-                        // select video element
-                        const videoElement = findVideoElement();
-                        if (videoElement) {
-                            console.log("Selected video element")
-                            let speedChange = changeVideoSpeed(ADVIDEOSPEED);
-                            if (!speedChange) {
-                                console.log("Could not change speed of ad...")
-                                return false
-                            }
-
-                        } else {
-                            console.log("Could not find video element")
-                        }
-
-                        // observer.disconnect();
-                        break;
-                    } else {
-                        const videoElement = findVideoElement();
-                        if (videoElement) {
-                            console.log("Selected video element")
-                            let speedChange = changeVideoSpeed(defaultVideoSpeed);
-                            if (!speedChange) {
-                                console.log("Could not change speed of ad...")
-                                return false
-                            }
-                        }
-
-                    }
-                    // const videoElement = findVideoElement();
-                    // if (videoElement) {
-                    //     console.log("Found video element!")
-                    //     const videoObserver = new MutationObserver(domChangeListener);
-                    //     videoObserver.observe(videoElement, {attributes: true, childList: true, subtree: true });
-
-                    //     // get rid of observer now:
-                    //     observer.disconnect();
-                    //     break;
-                    // }
-                }
-            }
-        });
-        observer.observe(document.body, {childList: true, subtree: true});
+        console.log("HBO CALLED AGAIN")
+        const appRoot = document.querySelector(hboAppRoot)
+        if (appRoot) {
+            console.log("creating a new hbo observer...")
+            // set up MutationObserver to detect changes on the DOM, ultimitaly waiting for the video element to load
+            const hboObserver = new MutationObserver(hboDomListener);
+            hboObserver.observe(appRoot, {childList: true, subtree: true});
+        } 
     }
 });
 
