@@ -2,12 +2,13 @@
 
 # Update:
 
-- Added support for HBO Max!
+- Added support for HBO Max
+- Added support for Netflix
 - Small performance improvments on Youtube
 
 # Description:
 
-PseudoBlocker watches Youtube ads at 16x speeds, greatly reducing the amount of time spent watching ads.
+PseudoBlocker watches ads at 16x speeds, greatly reducing the amount of time spent watching ads.
 
 # Features:
 
