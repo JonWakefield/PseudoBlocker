@@ -21,7 +21,9 @@ const nflxAdTimer = ".default-ltr-cache-mmvz9h";
 let nflxAdTimeLeft;
 let nflxAdPlaying = false;
 let pollingTimeLeft = false; 
-const nflxAdSpeed = 4;
+const nflxAdSpeed = 16;
+const nflxStopTime = 6;
+
 
 function domChangeListener(mutationsList, observer) {
     mutationsList.forEach(mutation => {
@@ -36,49 +38,68 @@ function findVideoElement() {
 }
 
 function adTimeRemaning(element) {
-    let timeLeft = document.querySelector(element).textContent;
-    if (timeLeft) {
+    let timeLeftSpan = document.querySelector(element);
+    if (timeLeftSpan) {
+        let timeLeft = timeLeftSpan.textContent;
         console.log("Time lefT: ", timeLeft)
         return parseInt(timeLeft, 10);
     } else {
-        console.log("COULD NOT FIND IT !")
+        console.log("Could not find span element")
+        // this most likely means the polling took place after the ad ended, so return 0
+        return 0;
     }
+}
 
+function nflxCheckForAd(element) {
+    let timeLeftSpan = document.querySelector(element);
+    if (timeLeftSpan) {
+        console.log("Found time span element...")
+        let timeLeft = timeLeftSpan.textContent;
+        console.log("Text content: ", timeLeft)
+        let val = parseInt(timeLeft, 10);
+        if (val <= nflxStopTime) {
+            // dont change ad speed
+            console.log("Too few seconds left, not entering!!")
+            return false;
+        } 
+        return true;
+    } else {
+        // could not find ad
+        return false;
+    }
 }
 
 function nflxDomListener(mutationsList, observer) {
     console.log("Checking for ad...")
-    const adBanner = checkIfAd(nflxAdBanner);
+    const adBanner = nflxCheckForAd(nflxAdTimer);
+
     // TOOD: Need to change up the logic, only change video speed if > 5 seconds left
-    if (adBanner) {
+    // NOTE: May need to change to (adBanner && !pollingTimeLeft) 
+    if (adBanner && !pollingTimeLeft) {
         console.log("Ad banner found!")
-        const videoElement = findVideoElement();
-        if (videoElement) {
-            // console.log("Changing speed...")
-            let speedChanged = changeVideoSpeed(nflxAdSpeed);
-            if (!speedChanged) {
-                return false;
-            }
-            nflxAdPlaying = true;
-            if (!pollingTimeLeft) {
-                const interval = setInterval(() => {
-                    pollingTimeLeft = true;
-                    let timeLeft = adTimeRemaning(nflxAdTimer);
-                    if (timeLeft < 5) {
-                        console.log("Less then 5 seconds left!!")
-                        // set video speed back to 1x
-                        let speedChanged = changeVideoSpeed(defaultVideoSpeed);
-                        if (!speedChanged) {
-                            // console.log("Failed to change video speed!")
-                            return false;
-                        }
-                        pollingTimeLeft = false;
-                        clearInterval(interval)
-                    }
-                }, ADSKIPINTERVAL)
-            }
-            return;
+        let speedChanged = changeVideoSpeed(nflxAdSpeed);
+        if (!speedChanged) {
+            return false;
         }
+        nflxAdPlaying = true;
+        if (!pollingTimeLeft) {
+            const interval = setInterval(() => {
+                pollingTimeLeft = true;
+                let timeLeft = adTimeRemaning(nflxAdTimer);
+                if (timeLeft <= nflxStopTime) {
+                    console.log("Less then 5 seconds left!!")
+                    // set video speed back to 1x
+                    let speedChanged = changeVideoSpeed(defaultVideoSpeed);
+                    if (!speedChanged) {
+                        // console.log("Failed to change video speed!")
+                        return false;
+                    }
+                    pollingTimeLeft = false;
+                    clearInterval(interval)
+                }
+            }, ADSKIPINTERVAL)
+        }
+        return;
     } else if (!adBanner && nflxAdPlaying){
         // set speed back to 1x...
         console.log("Ad ended!")
@@ -90,9 +111,7 @@ function nflxDomListener(mutationsList, observer) {
         }
         nflxAdPlaying = false;
         return;
-    } else {
-        // console.log("could not find an ad...")
-    }
+    } 
 }
 
 function hboDomListener(mutationsList, observer) {
