@@ -32,5 +32,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           console.log("Caught error on HBO: ", error);
         }
       }
+    else if (tab.url && tab.url.includes("netflix.com/watch")) {
+      try {
+        const response = chrome.tabs.sendMessage(tabId, {
+          type: "NFLX",
+          tab: tab,
+        });
+      } catch (error) {
+        console.log("Caught error accessing Netflix: ", error);
+      }
+    }
     }
 });

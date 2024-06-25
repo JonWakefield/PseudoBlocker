@@ -17,9 +17,101 @@ let hboFastForward = false;
 const HBOADSPEED = 5 // Ad speed
 
 
+// Netflix
+const nflxAppRoot = '#appMountPoint';
+const nflxAdBanner = ".forward-anim";
+const nflxAdTimer = ".default-ltr-cache-mmvz9h";
+let nflxAdTimeLeft;
+let nflxAdPlaying = false;
+let pollingTimeLeft = false; 
+const nflxAdSpeed = 16;
+const nflxStopTime = 6;
+const NFXLADTIMERCHECK = 80; // unit: ms
+
+
 function findVideoElement() {
     return document.querySelector('video');
 }
+
+function adTimeRemaning(element) {
+    let timeLeftSpan = document.querySelector(element);
+    if (timeLeftSpan) {
+        let timeLeft = timeLeftSpan.textContent;
+        // console.log("Time lefT: ", timeLeft)
+        return parseInt(timeLeft, 10);
+    } else {
+        // console.log("Could not find span element")
+        // this most likely means the polling took place after the ad ended, so return 0
+        return 0;
+    }
+}
+
+function nflxCheckForAd(element) {
+    let timeLeftSpan = document.querySelector(element);
+    if (timeLeftSpan) {
+        // console.log("Found time span element...")
+        let timeLeft = timeLeftSpan.textContent;
+        // console.log("Text content: ", timeLeft)
+        let val = parseInt(timeLeft, 10);
+        if (val <= nflxStopTime) {
+            // dont change ad speed
+            // console.log("Too few seconds left, not entering!!")
+            return false;
+        } 
+        return true;
+    } else {
+        // could not find ad
+        return false;
+    }
+}
+
+function nflxDomListener(mutationsList, observer) {
+    // console.log("Checking for ad...")
+    const adBanner = nflxCheckForAd(nflxAdTimer);
+
+    // TOOD: Need to change up the logic, only change video speed if > 5 seconds left
+    // NOTE: May need to change to (adBanner && !pollingTimeLeft) 
+    if (adBanner && !pollingTimeLeft) {
+        // console.log("Ad banner found!")
+        let speedChanged = changeVideoSpeed(nflxAdSpeed);
+        if (!speedChanged) {
+            return false;
+        }
+        nflxAdPlaying = true;
+        if (!pollingTimeLeft) {
+            pollingTimeLeft = true;
+            // console.log("Created new interval...")
+            const interval = setInterval(() => {
+                // console.log("interval start...")
+                let timeLeft = adTimeRemaning(nflxAdTimer);
+                if (timeLeft <= nflxStopTime) {
+                    // console.log("Less then 5 seconds left!!")
+                    // set video speed back to 1x
+                    let speedChanged = changeVideoSpeed(defaultVideoSpeed);
+                    if (!speedChanged) {
+                        // console.log("Failed to change video speed!")
+                        return false;
+                    }
+                    pollingTimeLeft = false;
+                    clearInterval(interval)
+                }
+            }, NFXLADTIMERCHECK)
+        }
+        return;
+    } else if (!adBanner && nflxAdPlaying){
+        // set speed back to 1x...
+        // console.log("Ad ended!")
+        // console.log("Found video element")
+        let speedChanged = changeVideoSpeed(defaultVideoSpeed);
+        if (!speedChanged) {
+            // console.log("Failed to change video speed!")
+            return false;
+        }
+        nflxAdPlaying = false;
+        return;
+    } 
+}
+
 
 function hboDomListener() {
     const adBanner = checkIfAd(hboAdBanner);
@@ -48,6 +140,38 @@ function hboDomListener() {
     }
 }
 
+
+chrome.runtime.onMessage.addListener((obj, sender, response) => {
+    const { type, tab } = obj;
+    if (type === "YT") {
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            const observer = new MutationObserver(ytDomListener);
+            observer.observe(videoElement, { attributes: true, childList: true, subtree: true });
+        } else {
+        console.log("No <video> element found on the page.");
+        }
+    } else if (type === "HBO") {
+        const appRoot = document.querySelector(hboAppRoot)
+        if (appRoot) {
+            const hboObserver = new MutationObserver(hboDomListener);
+            hboObserver.observe(appRoot, {childList: true, subtree: true});
+        } 
+    } else if (type === "NFLX") {
+        // console.log("In content")
+        const appRoot = document.querySelector(nflxAppRoot);
+        if (appRoot) {
+            // console.log("Found app root")
+            const nflxObserver = new MutationObserver(nflxDomListener);
+            nflxObserver.observe(appRoot, {childList: true, subtree: true});
+        } else {
+            console.log("Could not find root...")
+        }
+
+    }
+});
+
+
 function ytDomListener() {
     // check if an ad is present
     adPresent = checkIfAd(ytAdBanner);
@@ -71,26 +195,6 @@ function ytDomListener() {
     }
     return false;
 }
-
-chrome.runtime.onMessage.addListener((obj, sender, response) => {
-    const { type, tab } = obj;
-    if (type === "YT") {
-        const videoElement = findVideoElement();
-        if (videoElement) {
-            const observer = new MutationObserver(ytDomListener);
-            observer.observe(videoElement, { attributes: true, childList: true, subtree: true });
-        } else {
-        console.log("No <video> element found on the page.");
-        }
-    } else if (type === "HBO") {
-        const appRoot = document.querySelector(hboAppRoot)
-        if (appRoot) {
-            const hboObserver = new MutationObserver(hboDomListener);
-            hboObserver.observe(appRoot, {childList: true, subtree: true});
-        } 
-    }
-});
-
 
 function checkIfAd(adBanner) {
     /* Function checks if an ad is present on the DOM */
