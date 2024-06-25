@@ -23,6 +23,7 @@ let nflxAdPlaying = false;
 let pollingTimeLeft = false; 
 const nflxAdSpeed = 16;
 const nflxStopTime = 6;
+const NFXLADTIMERCHECK = 80; // unit: ms
 
 
 function domChangeListener(mutationsList, observer) {
@@ -41,10 +42,10 @@ function adTimeRemaning(element) {
     let timeLeftSpan = document.querySelector(element);
     if (timeLeftSpan) {
         let timeLeft = timeLeftSpan.textContent;
-        console.log("Time lefT: ", timeLeft)
+        // console.log("Time lefT: ", timeLeft)
         return parseInt(timeLeft, 10);
     } else {
-        console.log("Could not find span element")
+        // console.log("Could not find span element")
         // this most likely means the polling took place after the ad ended, so return 0
         return 0;
     }
@@ -53,13 +54,13 @@ function adTimeRemaning(element) {
 function nflxCheckForAd(element) {
     let timeLeftSpan = document.querySelector(element);
     if (timeLeftSpan) {
-        console.log("Found time span element...")
+        // console.log("Found time span element...")
         let timeLeft = timeLeftSpan.textContent;
-        console.log("Text content: ", timeLeft)
+        // console.log("Text content: ", timeLeft)
         let val = parseInt(timeLeft, 10);
         if (val <= nflxStopTime) {
             // dont change ad speed
-            console.log("Too few seconds left, not entering!!")
+            // console.log("Too few seconds left, not entering!!")
             return false;
         } 
         return true;
@@ -70,24 +71,26 @@ function nflxCheckForAd(element) {
 }
 
 function nflxDomListener(mutationsList, observer) {
-    console.log("Checking for ad...")
+    // console.log("Checking for ad...")
     const adBanner = nflxCheckForAd(nflxAdTimer);
 
     // TOOD: Need to change up the logic, only change video speed if > 5 seconds left
     // NOTE: May need to change to (adBanner && !pollingTimeLeft) 
     if (adBanner && !pollingTimeLeft) {
-        console.log("Ad banner found!")
+        // console.log("Ad banner found!")
         let speedChanged = changeVideoSpeed(nflxAdSpeed);
         if (!speedChanged) {
             return false;
         }
         nflxAdPlaying = true;
         if (!pollingTimeLeft) {
+            pollingTimeLeft = true;
+            // console.log("Created new interval...")
             const interval = setInterval(() => {
-                pollingTimeLeft = true;
+                // console.log("interval start...")
                 let timeLeft = adTimeRemaning(nflxAdTimer);
                 if (timeLeft <= nflxStopTime) {
-                    console.log("Less then 5 seconds left!!")
+                    // console.log("Less then 5 seconds left!!")
                     // set video speed back to 1x
                     let speedChanged = changeVideoSpeed(defaultVideoSpeed);
                     if (!speedChanged) {
@@ -97,12 +100,12 @@ function nflxDomListener(mutationsList, observer) {
                     pollingTimeLeft = false;
                     clearInterval(interval)
                 }
-            }, ADSKIPINTERVAL)
+            }, NFXLADTIMERCHECK)
         }
         return;
     } else if (!adBanner && nflxAdPlaying){
         // set speed back to 1x...
-        console.log("Ad ended!")
+        // console.log("Ad ended!")
         // console.log("Found video element")
         let speedChanged = changeVideoSpeed(defaultVideoSpeed);
         if (!speedChanged) {
@@ -150,7 +153,7 @@ function hboDomListener(mutationsList, observer) {
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
     const { type, tab } = obj;
     if (type === "YT") {
-        console.log("On Youtube...")
+        // console.log("On Youtube...")
         const videoElement = document.querySelector('video');
         if (videoElement) {
             const observer = new MutationObserver(domChangeListener);
@@ -170,7 +173,7 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
         // console.log("In content")
         const appRoot = document.querySelector(nflxAppRoot);
         if (appRoot) {
-            console.log("Found app root")
+            // console.log("Found app root")
             const nflxObserver = new MutationObserver(nflxDomListener);
             nflxObserver.observe(appRoot, {childList: true, subtree: true});
         } else {
