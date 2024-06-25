@@ -37,42 +37,30 @@ function adTimeRemaning(element) {
     let timeLeftSpan = document.querySelector(element);
     if (timeLeftSpan) {
         let timeLeft = timeLeftSpan.textContent;
-        // console.log("Time lefT: ", timeLeft)
         return parseInt(timeLeft, 10);
-    } else {
-        // console.log("Could not find span element")
-        // this most likely means the polling took place after the ad ended, so return 0
-        return 0;
     }
+    // this most likely means the polling took place after the ad ended, so return 0
+    return 0;
 }
 
 function nflxCheckForAd(element) {
     let timeLeftSpan = document.querySelector(element);
     if (timeLeftSpan) {
-        // console.log("Found time span element...")
         let timeLeft = timeLeftSpan.textContent;
-        // console.log("Text content: ", timeLeft)
         let val = parseInt(timeLeft, 10);
         if (val <= nflxStopTime) {
             // dont change ad speed
-            // console.log("Too few seconds left, not entering!!")
             return false;
         } 
         return true;
-    } else {
-        // could not find ad
-        return false;
     }
+    return false;
 }
 
-function nflxDomListener(mutationsList, observer) {
-    // console.log("Checking for ad...")
+function nflxDomListener() {
     const adBanner = nflxCheckForAd(nflxAdTimer);
 
-    // TOOD: Need to change up the logic, only change video speed if > 5 seconds left
-    // NOTE: May need to change to (adBanner && !pollingTimeLeft) 
     if (adBanner && !pollingTimeLeft) {
-        // console.log("Ad banner found!")
         let speedChanged = changeVideoSpeed(nflxAdSpeed);
         if (!speedChanged) {
             return false;
@@ -80,16 +68,12 @@ function nflxDomListener(mutationsList, observer) {
         nflxAdPlaying = true;
         if (!pollingTimeLeft) {
             pollingTimeLeft = true;
-            // console.log("Created new interval...")
             const interval = setInterval(() => {
-                // console.log("interval start...")
                 let timeLeft = adTimeRemaning(nflxAdTimer);
                 if (timeLeft <= nflxStopTime) {
-                    // console.log("Less then 5 seconds left!!")
                     // set video speed back to 1x
                     let speedChanged = changeVideoSpeed(defaultVideoSpeed);
                     if (!speedChanged) {
-                        // console.log("Failed to change video speed!")
                         return false;
                     }
                     pollingTimeLeft = false;
@@ -100,11 +84,8 @@ function nflxDomListener(mutationsList, observer) {
         return;
     } else if (!adBanner && nflxAdPlaying){
         // set speed back to 1x...
-        // console.log("Ad ended!")
-        // console.log("Found video element")
         let speedChanged = changeVideoSpeed(defaultVideoSpeed);
         if (!speedChanged) {
-            // console.log("Failed to change video speed!")
             return false;
         }
         nflxAdPlaying = false;
@@ -158,10 +139,8 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
             hboObserver.observe(appRoot, {childList: true, subtree: true});
         } 
     } else if (type === "NFLX") {
-        // console.log("In content")
         const appRoot = document.querySelector(nflxAppRoot);
         if (appRoot) {
-            // console.log("Found app root")
             const nflxObserver = new MutationObserver(nflxDomListener);
             nflxObserver.observe(appRoot, {childList: true, subtree: true});
         } else {
@@ -177,7 +156,6 @@ function ytDomListener() {
     adPresent = checkIfAd(ytAdBanner);
     let skippedAd = false;
     if (adPresent) {
-        console.log("FOUND AD!!")
         // change speed of ad:
         let speedChanged = changeVideoSpeed(ADVIDEOSPEED);
         if (!speedChanged) {
