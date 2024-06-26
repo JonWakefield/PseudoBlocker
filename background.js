@@ -9,6 +9,31 @@ chrome.runtime.onInstalled.addListener(({reason}) => {
     }
   });
 
+let initiators = {
+  NFLX: "https://www.netflix.com",
+  HBO: "https://play.max.com",
+}
+
+
+// For now, dealing with Neflix seperatly via network requests (HBO & Youtube using mutation observers still)
+chrome.webRequest.onBeforeRequest.addListener((details) => {
+  let url = details.url
+  if (url.includes("darnuid")) {
+      let tabId = details.tabId
+      try {
+        const response = chrome.tabs.sendMessage(tabId, {
+          type: "NFLX",
+        });
+      } catch (error) {
+        console.error("Caught error sending message to netflix: ", error)
+      }
+  } 
+}, 
+  {urls: [
+    "https://*.netflix.com/*",
+  ]}
+)
+
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete') {
@@ -32,15 +57,5 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
           console.log("Caught error on HBO: ", error);
         }
       }
-    else if (tab.url && tab.url.includes("netflix.com/watch")) {
-      try {
-        const response = chrome.tabs.sendMessage(tabId, {
-          type: "NFLX",
-          tab: tab,
-        });
-      } catch (error) {
-        console.log("Caught error accessing Netflix: ", error);
-      }
-    }
     }
 });

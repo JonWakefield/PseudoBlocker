@@ -57,40 +57,22 @@ function nflxCheckForAd(element) {
     return false;
 }
 
-function nflxDomListener() {
-    const adBanner = nflxCheckForAd(nflxAdTimer);
-
-    if (adBanner && !pollingTimeLeft) {
-        let speedChanged = changeVideoSpeed(nflxAdSpeed);
-        if (!speedChanged) {
-            return false;
+function nflxWatchAd() {
+    let speedChanged = changeVideoSpeed(nflxAdSpeed);
+    if (!speedChanged) {
+        return false;
+    }
+    const interval = setInterval(() => {
+        let timeLeft = adTimeRemaning(nflxAdTimer);
+        if (timeLeft <= nflxStopTime) {
+            // set video speed back to 1x
+            let speedChanged = changeVideoSpeed(defaultVideoSpeed);
+            if (!speedChanged) {
+                return false;
+            }
+            clearInterval(interval)
         }
-        nflxAdPlaying = true;
-        if (!pollingTimeLeft) {
-            pollingTimeLeft = true;
-            const interval = setInterval(() => {
-                let timeLeft = adTimeRemaning(nflxAdTimer);
-                if (timeLeft <= nflxStopTime) {
-                    // set video speed back to 1x
-                    let speedChanged = changeVideoSpeed(defaultVideoSpeed);
-                    if (!speedChanged) {
-                        return false;
-                    }
-                    pollingTimeLeft = false;
-                    clearInterval(interval)
-                }
-            }, NFXLADTIMERCHECK)
-        }
-        return;
-    } else if (!adBanner && nflxAdPlaying){
-        // set speed back to 1x...
-        let speedChanged = changeVideoSpeed(defaultVideoSpeed);
-        if (!speedChanged) {
-            return false;
-        }
-        nflxAdPlaying = false;
-        return;
-    } 
+    }, NFXLADTIMERCHECK)
 }
 
 
@@ -123,7 +105,7 @@ function hboDomListener() {
 
 
 chrome.runtime.onMessage.addListener((obj, sender, response) => {
-    const { type, tab } = obj;
+    const {type} = obj;
     if (type === "YT") {
         const videoElement = findVideoElement();
         if (videoElement) {
@@ -139,14 +121,7 @@ chrome.runtime.onMessage.addListener((obj, sender, response) => {
             hboObserver.observe(appRoot, {childList: true, subtree: true});
         } 
     } else if (type === "NFLX") {
-        const appRoot = document.querySelector(nflxAppRoot);
-        if (appRoot) {
-            const nflxObserver = new MutationObserver(nflxDomListener);
-            nflxObserver.observe(appRoot, {childList: true, subtree: true});
-        } else {
-            console.log("Could not find root...")
-        }
-
+        nflxWatchAd();
     }
 });
 
