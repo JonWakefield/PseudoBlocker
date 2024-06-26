@@ -13,6 +13,7 @@
     "https://*.max.com/*",
     "https://*.netflix.com/*"
   ],
+  "permissions": ["webRequest"],
   "background": {
     "service_worker": "background.js"
   },
