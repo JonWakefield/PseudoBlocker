@@ -1,3 +1,4 @@
+// general
 const defaultVideoSpeed = 1
 
 // Youtube
@@ -18,12 +19,7 @@ const HBOADSPEED = 5 // Ad speed
 
 
 // Netflix
-const nflxAppRoot = '#appMountPoint';
-const nflxAdBanner = ".forward-anim";
 const nflxAdTimer = ".default-ltr-cache-mmvz9h";
-let nflxAdTimeLeft;
-let nflxAdPlaying = false;
-let pollingTimeLeft = false; 
 const nflxAdSpeed = 16;
 const nflxStopTime = 6;
 const NFXLADTIMERCHECK = 80; // unit: ms
@@ -41,20 +37,6 @@ function adTimeRemaning(element) {
     }
     // this most likely means the polling took place after the ad ended, so return 0
     return 0;
-}
-
-function nflxCheckForAd(element) {
-    let timeLeftSpan = document.querySelector(element);
-    if (timeLeftSpan) {
-        let timeLeft = timeLeftSpan.textContent;
-        let val = parseInt(timeLeft, 10);
-        if (val <= nflxStopTime) {
-            // dont change ad speed
-            return false;
-        } 
-        return true;
-    }
-    return false;
 }
 
 function nflxWatchAd() {
