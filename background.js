@@ -10,11 +10,12 @@ chrome.runtime.onInstalled.addListener(({reason}) => {
   });
 
 let initiators = {
-  NFLX: "https://www.netflix.com"
+  NFLX: "https://www.netflix.com",
+  HBO: "https://play.max.com",
 }
 
 
-// TODO: decide how to handle network requests between multiple sites
+// For now, dealing with Neflix seperatly via network requests (HBO & Youtube using mutation observers still)
 chrome.webRequest.onBeforeRequest.addListener((details) => {
   let url = details.url
   if (url.includes("darnuid")) {
@@ -26,41 +27,35 @@ chrome.webRequest.onBeforeRequest.addListener((details) => {
       } catch (error) {
         console.error("Caught error sending message to netflix: ", error)
       }
+  } 
+}, 
+  {urls: [
+    "https://*.netflix.com/*",
+  ]}
+)
+
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete') {
+    if (tab.url && tab.url.includes("youtube.com/watch")) {
+      try {
+        const response = chrome.tabs.sendMessage(tabId, {
+          type: "YT",
+          tab: tab,
+        });
+      } catch (error) {
+        console.log("Caught error on Youtube: ", error);
+      }
     }
-}, {urls: ["https://*.netflix.com/*"]})
-
-
-// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-//   if (changeInfo.status === 'complete') {
-//     if (tab.url && tab.url.includes("youtube.com/watch")) {
-//       try {
-//         const response = chrome.tabs.sendMessage(tabId, {
-//           type: "YT",
-//           tab: tab,
-//         });
-//       } catch (error) {
-//         console.log("Caught error on Youtube: ", error);
-//       }
-//     }
-//     else if (tab.url && tab.url.includes("play.max.com/video")) {
-//         try {
-//           const response = chrome.tabs.sendMessage(tabId, {
-//               type: "HBO",
-//               tab: tab,
-//             });
-//         } catch (error) {
-//           console.log("Caught error on HBO: ", error);
-//         }
-//       }
-//     else if (tab.url && tab.url.includes("netflix.com/watch")) {
-//       try {
-//         const response = chrome.tabs.sendMessage(tabId, {
-//           type: "NFLX",
-//           tab: tab,
-//         });
-//       } catch (error) {
-//         console.log("Caught error accessing Netflix: ", error);
-//       }
-//     }
-//     }
-// });
+    else if (tab.url && tab.url.includes("play.max.com/video")) {
+        try {
+          const response = chrome.tabs.sendMessage(tabId, {
+              type: "HBO",
+              tab: tab,
+            });
+        } catch (error) {
+          console.log("Caught error on HBO: ", error);
+        }
+      }
+    }
+});
