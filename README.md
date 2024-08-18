@@ -2,9 +2,9 @@
 
 # Update:
 
-- Added support for HBO Max
-- Added support for Netflix
-- Small performance improvments on Youtube
+Due to YouTube constantly flagging PseudoBlocker with the "Ad blockers violate YouTube's Terms of Service" blackout message, I have removed the extension from the chrome webstore
+
+If you still wish to use PseudoBlocker, manually installing the extension (see [here](#cloned-from-git)) seems to still work quite well. Occassionly you may still get the same blackout message, however disabling PseudoBlocker & waiting a day, then clearing your YouTube related cookies (F12 -> Application tab -> cookies) seems to fix this problem. While it is inconvient, I still find it a significant improvement over constantly watching ads.
 
 # Description:
 
@@ -15,6 +15,7 @@ PseudoBlocker watches ads at 16x speeds, greatly reducing the amount of time spe
 - Speeds up playback speed to 16x
 - Auto skips ads when able
 - No permissions needed
+- Support for HBO Max & Netflix
 
 # Demo:
 
@@ -22,11 +23,7 @@ PseudoBlocker watches ads at 16x speeds, greatly reducing the amount of time spe
 
 # Installation
 
-Setting up PseudoBlocker can be done via the chrome web store or cloned from github
-
-### Chrome Web Store:
-
-PseudoBlocker can be downloaded from the chrome web store [Here](https://chromewebstore.google.com/detail/pseudoblocker/dhknglbhklndbfiibpocgckdhfdagcgb)
+Setting up PseudoBlocker can be done via cloning from github
 
 ### Cloned from git
 
