@@ -11,12 +11,14 @@ const ADVIDEOSPEED = 16 // Ad speed
 const ADSKIPINTERVAL = 500 // units: ms
 
 // HBO
-const hboAppRoot = '#app-root';
-const hboAdBanner = ".AdBadgeContainer-Beam-Web-Ent__sc-1jahjvv-1";
-let hboAdPlaying = false;
-let hboFastForward = false;
-const HBOADSPEED = 5 // Ad speed
-
+const HBO_DOM = {
+    appRoot: '#app-root',
+    // adBanner: ".AdBadgeContainer-Beam-Web-Ent__sc-1jahjvv-1",
+    adBanner: ".AdLabel-Fuse-Web-Play__sc-1jahjvv-2",
+    adPlaying: false,
+    fastForward: false,
+    adSpeed: 5,
+}
 
 // Netflix
 const nflxAdTimer = ".default-ltr-cache-mmvz9h";
@@ -58,56 +60,6 @@ function nflxWatchAd() {
 }
 
 
-function hboDomListener() {
-    const adBanner = checkIfAd(hboAdBanner);
-    if (adBanner) {
-        // fast forward ad 
-        const videoElement = findVideoElement();
-        if (videoElement) {
-            let speedChanged = changeVideoSpeed(HBOADSPEED);
-            if (!speedChanged) {
-                return false;
-            }
-            hboAdPlaying = true;
-            return;
-        }
-    } else if (!adBanner && hboAdPlaying) {
-        // return video speed back to 1x
-        const videoElement = findVideoElement();
-        if (videoElement) {
-            let speedChanged = changeVideoSpeed(defaultVideoSpeed);
-            if (!speedChanged) {
-                return false;
-            }
-            hboAdPlaying = false;
-            return;
-        }
-    }
-}
-
-
-chrome.runtime.onMessage.addListener((obj, sender, response) => {
-    const {type} = obj;
-    if (type === "YT") {
-        const videoElement = findVideoElement();
-        if (videoElement) {
-            const observer = new MutationObserver(ytDomListener);
-            observer.observe(videoElement, { attributes: true, childList: true, subtree: true });
-        } else {
-        console.log("No <video> element found on the page.");
-        }
-    } else if (type === "HBO") {
-        const appRoot = document.querySelector(hboAppRoot)
-        if (appRoot) {
-            const hboObserver = new MutationObserver(hboDomListener);
-            hboObserver.observe(appRoot, {childList: true, subtree: true});
-        } 
-    } else if (type === "NFLX") {
-        nflxWatchAd();
-    }
-});
-
-
 function ytDomListener() {
     // check if an ad is present
     adPresent = checkIfAd(ytAdBanner);
@@ -135,8 +87,8 @@ function checkIfAd(adBanner) {
     /* Function checks if an ad is present on the DOM */
     const adElement = document.querySelector(adBanner);
     if (adElement) {
-        return true;   
-    } 
+        return true;
+    }
     return false;
 }
 
@@ -164,10 +116,94 @@ function tryAdSkip() {
 
 function changeVideoSpeed(speed) {
     /* Changes speed of the video element */
-    const video = document.querySelector('video'); 
+    const video = document.querySelector('video');
     if (video) {
         video.playbackRate = speed;
         return true;
     }
     return false;
 }
+
+
+function hboDomListener() {
+    const adBanner = checkIfAd(HBO_DOM.adBanner);
+    if (adBanner) {
+        console.log("Ad planning!")
+        // fast forward ad 
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            let speedChanged = changeVideoSpeed(HBO_DOM.adSpeed);
+            if (!speedChanged) {
+                return false;
+            }
+            HBO_DOM.adPlaying = true;
+            return;
+        }
+    } else if (!adBanner && HBO_DOM.adPlaying) {
+        // return video speed back to 1x
+        const videoElement = findVideoElement();
+        if (videoElement) {
+            let speedChanged = changeVideoSpeed(defaultVideoSpeed);
+            if (!speedChanged) {
+                return false;
+            }
+            HBO_DOM.adPlaying = false;
+            return;
+        }
+    }
+}
+
+
+async function maxBlocker() {
+    console.log("Setting up max...")
+    const appRoot = document.querySelector(HBO_DOM.appRoot)
+    if (appRoot) {
+        console.log("Creating a mutationobserver...")
+        const hboObserver = new MutationObserver(hboDomListener);
+        hboObserver.observe(appRoot, { childList: true, subtree: true });
+    }
+}
+
+async function handleSiteVisit(msg) {
+    const site = msg.site;
+    switch (site) {
+        case "youtube":
+            console.log("On youtube...")
+            const videoElement = findVideoElement();
+            if (videoElement) {
+                const observer = new MutationObserver(ytDomListener);
+                observer.observe(videoElement, { attributes: true, childList: true, subtree: true });
+            } else {
+                console.log("No <video> element found on the page.");
+            }
+            break
+        case "hbo_max":
+            console.log("On Max...")
+            await maxBlocker();
+            break
+        default:
+            console.log("Unrecognized site: ", site);
+    }
+}
+
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+
+    if (msg.type === "SITE_VISIT") {
+        handleSiteVisit(msg).then(() => {
+            sendResponse({ success: true });
+        }).catch((err) => {
+            console.error("Error handling site visit: ", err)
+            sendResponse({ success: false, error: err.message });
+        });
+
+        return true; // keep the message channel open
+    }
+});
+
+chrome.runtime.sendMessage({
+    type: "CONTENT_SCRIPT_READY",
+    url: window.location.href,
+}).catch(err => {
+    console.log('Could not notify background script: ', err.message);
+})
