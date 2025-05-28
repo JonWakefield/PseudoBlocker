@@ -1,5 +1,9 @@
 // general
 const defaultVideoSpeed = 1
+let observers = {
+    youtube: null,
+    hbo_max: null,
+}
 
 // Youtube
 // const ytAppRoot = 'ytd-app';
@@ -154,13 +158,19 @@ function hboDomListener() {
 }
 
 
-async function maxBlocker() {
-    console.log("Setting up max...")
+async function setupMaxObserver() {
+    if (observers.hbo_max)
+        return
+
     const appRoot = document.querySelector(HBO_DOM.appRoot)
-    if (appRoot) {
-        console.log("Creating a mutationobserver...")
+    if (appRoot && !observers.hbo_max) {
+        console.log("Creating an observer for HBO Max...")
         const hboObserver = new MutationObserver(hboDomListener);
         hboObserver.observe(appRoot, { childList: true, subtree: true });
+        observers.hbo_max = true;
+    } else {
+        console.log("App root not found, retrying ...")
+        setTimeout(() => setupMaxObserver(), 1000);
     }
 }
 
@@ -179,7 +189,7 @@ async function handleSiteVisit(msg) {
             break
         case "hbo_max":
             console.log("On Max...")
-            await maxBlocker();
+            await setupMaxObserver();
             break
         default:
             console.log("Unrecognized site: ", site);
@@ -188,6 +198,7 @@ async function handleSiteVisit(msg) {
 
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    // This is where background.js sends a message to contentScript.js to create a mutation observer
 
     if (msg.type === "SITE_VISIT") {
         handleSiteVisit(msg).then(() => {
@@ -207,3 +218,30 @@ chrome.runtime.sendMessage({
 }).catch(err => {
     console.log('Could not notify background script: ', err.message);
 })
+
+
+function cleanupObserver(site) {
+    if (observers[site]) {
+        console.log(`Cleaning up observer for ${site}`)
+        observers[site].disconnect();
+        observers[site] = null;
+    }
+}
+
+function cleanupAllObservers() {
+    Object.keys(observers).forEach(site => {
+        cleanupObserver(site);
+    })
+}
+
+window.addEventListener("beforeunload", () => {
+    cleanupAllObservers();
+})
+
+// Debug function to check observer status
+window.debugObservers = function () {
+    console.log('Observer status:', {
+        youtube: observers.youtube ? 'active' : 'inactive',
+        hbo_max: observers.hbo_max ? 'active' : 'inactive'
+    });
+};
